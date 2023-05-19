@@ -9,6 +9,11 @@ public class Character : MonoBehaviour
     public float speed;
     public float HorizInput;
 
+    //Jumping
+    [Header("Jumping")]
+    public bool IsOnground;
+    public float JumpForce;
+
     //Animation
     [Header("Animation booleans")]
     public bool IsWalking;
@@ -38,14 +43,38 @@ public class Character : MonoBehaviour
     void Update()
     {
         //Animator declarations
+        Anim.SetBool("IsWalking", IsWalking);
+        Anim.SetBool("IsJumping", IsOnground);
+        Anim.SetBool("IsAttacking", IsAttacking);
+        Anim.SetBool("IsActing", IsChoicing);
 
+        //Declarations
+        HorizInput = Input.GetAxis("Horizontal");
 
         //Walking
         transform.Translate(Vector2.right * HorizInput * speed * Time.deltaTime );
 
+        if(HorizInput < 0)
+        {
+            IsWalking = true;
+        }
+        else if (HorizInput > 0)
+        {
+            IsWalking = true;
+        }
+        else
+        {
+            IsWalking = false;
+        }
+
+
 
         //Jumping
-
+        if(Input.GetKeyDown(Jumpkey) &&  IsOnground == true)
+        {
+            Rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
+            IsOnground = false;
+        }
 
         //Attacking
         if (Input.GetKeyDown(Attackkey))
@@ -65,6 +94,18 @@ public class Character : MonoBehaviour
         else
         {
            IsChoicing = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            IsOnground = true;
+        }
+        else
+        {
+            IsOnground = false;
         }
     }
 }
